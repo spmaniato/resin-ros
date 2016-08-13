@@ -1,0 +1,49 @@
+FROM resin/%%RESIN_MACHINE_NAME%%-python
+
+MAINTAINER Spyros Maniatopoulos spmaniato@gmail.com
+
+# Switch on systemd init system in container
+ENV INITSYSTEM on
+
+# ROS distribution and configuration
+ENV ROS_DISTRO indigo
+ENV ROS_CONFIG ros_comm
+ENV CATKIN_WS /usr/catkin_ws
+
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+  build-essential
+
+# RUN ln -s /usr/lib/arm-linux-gnueabihf/liblog4cxx.so /usr/lib/
+
+# Install ROS-related tools
+WORKDIR /usr
+COPY ./requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
+
+RUN rosdep init \
+    && rosdep update
+
+RUN mkdir -p $CATKIN_WS/src
+
+WORKDIR $CATKIN_WS
+
+RUN rosinstall_generator $ROS_CONFIG --rosdistro $ROS_DISTRO \
+    --deps --tar > .rosinstall \
+    && wstool init src .rosinstall \
+    && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN catkin init \
+    && catkin config --install --default-install-space \
+    --cmake-args -DCMAKE_BUILD_TYPE=Release \
+    && catkin build
+
+# TODO: Delete tars in src after installation
+
+COPY ./ros_entrypoint.sh $CATKIN_WS
+WORKDIR $CATKIN_WS
+
+ENTRYPOINT ["bash", "ros_entrypoint.sh"]
+
+CMD ["bash"]
