@@ -1,4 +1,5 @@
-FROM resin/%%RESIN_MACHINE_NAME%%-python
+# FROM resin/%%RESIN_MACHINE_NAME%%-python:2.7
+FROM resin/%%RESIN_MACHINE_NAME%%-buildpack-deps
 
 MAINTAINER Spyros Maniatopoulos spmaniato@gmail.com
 
@@ -12,11 +13,13 @@ ENV CATKIN_WS /usr/catkin_ws
 ENV ROS_INSTALL_DIR /opt/ros/$ROS_DISTRO
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-  build-essential
+    build-essential \
+    python-dev \
+    python-pip
 
 # RUN ln -s /usr/lib/arm-linux-gnueabihf/liblog4cxx.so /usr/lib/
 
-# Install ROS-related tools
+# Install ROS-related Python tools
 WORKDIR /usr
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
