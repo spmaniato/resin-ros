@@ -10,6 +10,12 @@ ENV ROS_DISTRO indigo
 ENV ROS_CONFIG ros_comm
 ENV CATKIN_WS /usr/catkin_ws
 
+# ENV ROS_TOOLS "python-rosdep python-rosinstall-generator python-rosinstall python-catkin-tools"
+#
+# RUN echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list \
+#     && apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
+#     && apt-get update && apt-get install -yq --no-install-recommends $ROS_TOOLS
+
 RUN apt-get update && apt-get install -yq --no-install-recommends \
   build-essential
 
@@ -30,7 +36,9 @@ WORKDIR $CATKIN_WS
 RUN rosinstall_generator $ROS_CONFIG --rosdistro $ROS_DISTRO \
     --deps --tar > .rosinstall \
     && wstool init src .rosinstall \
-    && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
+    && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y \
+       --skip-keys python-rosdep \
+       --skip-keys python-rospkg
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
