@@ -6,6 +6,8 @@ MAINTAINER Spyros Maniatopoulos spmaniato@gmail.com
 # Switch on systemd init system in container
 ENV INITSYSTEM on
 
+ENV TERM xterm
+
 # ROS distribution and configuration
 ENV ROS_DISTRO indigo
 ENV ROS_CONFIG ros_comm
