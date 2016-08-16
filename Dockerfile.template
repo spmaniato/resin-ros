@@ -41,7 +41,8 @@ RUN catkin init \
     && catkin config --install --install-space $ROS_INSTALL_DIR \
        --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && catkin build --no-status --no-summary --no-notify \
-    && catkin clean -y --logs --build --devel
+    && catkin clean -y --logs --build --devel \
+    && rm -rf $CATKIN_WS/src
 
 COPY ./ros_entrypoint.sh .
 
