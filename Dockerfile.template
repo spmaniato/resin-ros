@@ -9,7 +9,7 @@ ENV INITSYSTEM="on" \
 
 # Variables for ROS distribution, configuration, and relevant directories
 ENV ROS_DISTRO="indigo" \
-    ROS_CONFIG="ros_comm"
+    ROS_CONFIG="ros_base"
 ENV CATKIN_WS="/usr/catkin_ws" \
     ROS_INSTALL_DIR="/opt/ros/$ROS_DISTRO"
 
