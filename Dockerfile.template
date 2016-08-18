@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 # Install ROS-related Python tools
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && rm requirements.txt
 
 RUN rosdep init \
     && rosdep update
@@ -33,16 +33,19 @@ RUN rosinstall_generator $ROS_CONFIG --rosdistro $ROS_DISTRO \
     && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y \
        --skip-keys python-rosdep \
        --skip-keys python-rospkg \
-       --skip-keys python-catkin-pkg
-
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+       --skip-keys python-catkin-pkg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN catkin init \
     && catkin config --install --install-space $ROS_INSTALL_DIR \
        --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && catkin build --no-status --no-summary --no-notify \
-    && catkin clean -y --logs --build --devel \
-    && rm -rf $CATKIN_WS/src
+    && catkin clean -y --logs --build --devel
+
+WORKDIR /usr
+
+RUN rm -rf $CATKIN_WS
 
 COPY ./ros_entrypoint.sh .
 
